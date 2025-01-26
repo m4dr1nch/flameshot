@@ -18,8 +18,8 @@
 #include <QWheelEvent>
 
 namespace {
-constexpr int MARGIN = 7;
-constexpr int BLUR_RADIUS = 2 * MARGIN;
+constexpr int MARGIN = 1;
+constexpr int BORDER_THICKNESS = 2 * MARGIN;
 constexpr qreal STEP = 0.03;
 constexpr qreal MIN_SIZE = 100.0;
 }
@@ -31,7 +31,6 @@ PinWidget::PinWidget(const QPixmap& pixmap,
   , m_pixmap(pixmap)
   , m_layout(new QVBoxLayout(this))
   , m_label(new QLabel())
-  , m_shadowEffect(new QGraphicsDropShadowEffect(this))
 {
     setWindowIcon(QIcon(GlobalValues::iconPath()));
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
@@ -41,16 +40,17 @@ PinWidget::PinWidget(const QPixmap& pixmap,
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("flameshot-pin");
     ConfigHandler conf;
+
     m_baseColor = conf.uiColor();
     m_hoverColor = conf.contrastUiColor();
+    m_activeColor = m_baseColor;
 
-    m_layout->setContentsMargins(MARGIN, MARGIN, MARGIN, MARGIN);
-
-    m_shadowEffect->setColor(m_baseColor);
-    m_shadowEffect->setBlurRadius(BLUR_RADIUS);
-    m_shadowEffect->setOffset(0, 0);
-    setGraphicsEffect(m_shadowEffect);
-    setWindowOpacity(m_opacity);
+    m_layout->setContentsMargins(
+        MARGIN,
+        MARGIN,
+        MARGIN,
+        MARGIN
+    );
 
     m_label->setPixmap(m_pixmap);
     m_layout->addWidget(m_label);
@@ -138,12 +138,14 @@ bool PinWidget::scrollEvent(QWheelEvent* event)
 
 void PinWidget::enterEvent(QEvent*)
 {
-    m_shadowEffect->setColor(m_hoverColor);
+    m_activeColor = m_hoverColor;
+    update();
 }
 
 void PinWidget::leaveEvent(QEvent*)
 {
-    m_shadowEffect->setColor(m_baseColor);
+    m_activeColor = m_baseColor;
+    update();
 }
 
 void PinWidget::mouseDoubleClickEvent(QMouseEvent*)
@@ -248,6 +250,10 @@ bool PinWidget::event(QEvent* event)
 
 void PinWidget::paintEvent(QPaintEvent* event)
 {
+    QPainter m_painter(this);
+    m_painter.setPen(QPen(this->m_activeColor, BORDER_THICKNESS));
+    m_painter.drawRect(0, 0, width() - 1, height() - 1);
+
     if (m_sizeChanged) {
         const auto aspectRatio =
           m_expanding ? Qt::KeepAspectRatioByExpanding : Qt::KeepAspectRatio;

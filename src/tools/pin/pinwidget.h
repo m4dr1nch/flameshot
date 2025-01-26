@@ -48,7 +48,7 @@ private:
     QPoint m_dragStart;
     qreal m_offsetX{}, m_offsetY{};
     QGraphicsDropShadowEffect* m_shadowEffect;
-    QColor m_baseColor, m_hoverColor;
+    QColor m_baseColor, m_hoverColor, m_activeColor;
 
     bool m_expanding{ false };
     qreal m_scaleFactor{ 1 };
