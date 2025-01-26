@@ -1,3 +1,10 @@
+**Fork modifications:**
+1. Removed capture focuss on pin;
+2. Changed border gradient to solid border;
+
+![](data/img/preview/previewNew.png)
+
+---
 <div align="center">
   <p>
     <h1>
