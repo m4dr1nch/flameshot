@@ -266,7 +266,10 @@ void FlameshotDaemon::attachPin(const QPixmap& pixmap, QRect geometry)
     });
 
     pinWidget->show();
-    pinWidget->activateWindow();
+    // A trick to realease keyboard focuss
+    // Focuss messes w/ window manager's shortcuts etc.
+    pinWidget->grabKeyboard();
+    pinWidget->releaseKeyboard();
 }
 
 void FlameshotDaemon::attachScreenshotToClipboard(const QPixmap& pixmap)
